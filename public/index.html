@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cooki</title>
+</head>
+<body>
+    <h1>C is for Cooki</h1>
+
+    <form>
+        <input type="text" id="input" placeholder="my message...">
+        <button disabled>Submit</button>
+    </form>
+
+    <div></div>
+
+    <script type="module">
+        const url = "http://localhost:7000"
+        async function fetchCooki() {
+            const response = await fetch(`${url}/token/${Math.floor(Math.random()*99999)}`)
+            const result = await response.json()
+        }
+
+        fetchCooki()
+
+        const submitBtn = document.querySelector('button')
+        const inputMsg = document.getElementById('input')
+        const form = document.querySelector('form')
+        const div = document.querySelector('div')
+
+        function updateSubmitBtn() {
+            if(inputMsg.value === "") {
+                submitBtn.setAttribute('disabled', 'disabled')
+            } else {
+                submitBtn.removeAttribute('disabled')
+            }
+        }
+
+        inputMsg.addEventListener('change', updateSubmitBtn)
+        
+
+        let returnResult = ""
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault()
+            div.innerText = ""
+            const payload = {
+                "message": document.getElementById('input').value
+            }
+            const headers = { "Content-Type": "application/json" }
+            const config = { method: "POST", headers, body: JSON.stringify(payload) }
+
+            try {
+                const response = await fetch(`${url}/message`, config)
+                const result = await response.json() // SyntaxError: Unexpected token o in JSON at position 0, check if your BE is sending back a JSON
+                console.log('result :>> ', result );
+                returnResult = result
+            } catch (err) {
+                console.log('err :>> ', err);
+            }
+
+            console.log('returnResult.success :>> ', returnResult.success);
+            if(returnResult.success) {
+                div.style.cssText = "margin: 2px; color: green"
+                div.innerText = returnResult.success
+            } else if (returnResult.error) {
+                div.style.cssText = "margin: 2px; color: red"
+                div.innerText = returnResult.error
+            }
+        })
+
+
+    </script>
+</body>
+</html>
